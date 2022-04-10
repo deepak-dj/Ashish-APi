@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>get_all</title>
+</head>
+<body>
+
+
+{% for i in data %}
+    {{ i.id }}
+    {{ i.name }}
+    {{ i.roll_no }}
+    {{ i.address }}
+
+    <a href="{% url 'update' i.id %}"> update</a>
+    <a href="{% url 'delete' i.id%}"> delete</a>
+    <a href="{% url 'home' i.id%}"> home</a>
+
+{% endfor %}
+
+
+</body>
+</html>
