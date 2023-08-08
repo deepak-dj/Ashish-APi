@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'ashish_db',
         'USER': 'postgres',
         'PASSWORD': 'root',
-        'HOST': 'ashish_db_1',
+        'HOST': 'postgres',
         'PORT': 5432
     }
 }
