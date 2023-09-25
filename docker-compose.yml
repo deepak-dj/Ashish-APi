@@ -25,3 +25,4 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     depends_on:
       - db
+    working_dir: C:/ProgramData/Jenkins/.jenkins/workspace/Ashish_pipeline/
