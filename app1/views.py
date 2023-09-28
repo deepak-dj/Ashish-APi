@@ -78,3 +78,6 @@ def delete_student(request, id):
         return HttpResponse('data deleted')
     else:
         return HttpResponse('data not available to delete')
+
+def patch_student():
+    pass
