@@ -2,27 +2,29 @@ version: "3.9"
 
 services:
   db:
-    image: postgres
+    image: "postgres"
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=ashish_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=root
+      POSTGRES_DB: ashish_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
 
   web:
-    build: .
-    restart: always
-    command: python /code/manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
+    build:
+     context: .
+    # restart: always
+    # command: python /code/manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - .:/code
     ports:
       - "8000:8000"
     environment:
-      - POSTGRES_DB=ashish_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mysecretpassword
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      POSTGRES_DB: ashish_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_HOST: db
+      POSTGRES_HOST_AUTH_METHOD: trust
     depends_on:
       - db
-    working_dir: C:/ProgramData/Jenkins/.jenkins/workspace/Ashish_pipeline/
+    # working_dir: C:/ProgramData/Jenkins/.jenkins/workspace/Ashish_pipeline/
