@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label "ashish-agent" }
     stages{
         stage("code clone") {
             steps{
