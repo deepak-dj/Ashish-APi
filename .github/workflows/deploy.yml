@@ -25,24 +25,31 @@ jobs:
           # Sync files to EC2 instance
           rsync -avz --delete --exclude='.git' ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.DEPLOY_PATH }}
 
+          # SSH into EC2 instance and setup the environment
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd ${{ secrets.DEPLOY_PATH }}
+
+            # Update package list and install required packages
+            sudo apt update
+            sudo apt install -y python3.12 python3.12-venv python3-pip
+
             VIRTUAL_ENV=venv
             # Create a virtual environment if it doesn't exist
             if [ ! -d "$VIRTUAL_ENV" ]; then
-              python3 -m venv "$VIRTUAL_ENV"
+              python3.12 -m venv "$VIRTUAL_ENV"
             fi
-          
+
             # Activate the virtual environment and install dependencies
             source "$VIRTUAL_ENV/bin/activate"
+            pip install --upgrade pip  # Upgrade pip
             pip install -r requirements.txt
-          
+
             # Run database migrations
             python manage.py migrate
-          
+
             # Collect static files
             python manage.py collectstatic --noinput
-          
+
             # Restart the Django application (using runserver)
             pkill -f "runserver"  # Kill existing runserver processes
             nohup python manage.py runserver 0.0.0.0:8000 &
