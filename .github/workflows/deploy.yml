@@ -45,6 +45,8 @@ jobs:
             python manage.py collectstatic --noinput
 
             # Restart the Django application (using Gunicorn or similar)
-            pkill -f "gunicorn"  # Kill existing Gunicorn processes
-            nohup gunicorn your_project_name.wsgi:application --bind 0.0.0.0:8000 &  # Start Django in the background
-          EOF
+#            pkill -f "gunicorn"  # Kill existing Gunicorn processes
+#            nohup gunicorn your_project_name.wsgi:application --bind 0.0.0.0:8000 &  # Start Django in the background
+            pkill -f "runserver"  # Kill existing runserver processes
+            nohup python manage.py runserver 0.0.0.0:8000 &
+            EOF
