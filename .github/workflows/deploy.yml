@@ -31,11 +31,11 @@ jobs:
             VIRTUAL_ENV=venv
             # Create a virtual environment if it doesn't exist
             if [ ! -d "$VIRTUAL_ENV" ]; then
-              python3 -m venv $VIRTUAL_ENV
+              python3 -m venv "$VIRTUAL_ENV"
             fi
 
             # Activate the virtual environment and install dependencies
-            source $VIRTUAL_ENV/bin/activate
+            source "$VIRTUAL_ENV/bin/activate"
             pip install -r requirements.txt
 
             # Run database migrations
@@ -44,9 +44,7 @@ jobs:
             # Collect static files
             python manage.py collectstatic --noinput
 
-            # Restart the Django application (using Gunicorn or similar)
-#            pkill -f "gunicorn"  # Kill existing Gunicorn processes
-#            nohup gunicorn your_project_name.wsgi:application --bind 0.0.0.0:8000 &  # Start Django in the background
+            # Restart the Django application (using runserver)
             pkill -f "runserver"  # Kill existing runserver processes
             nohup python manage.py runserver 0.0.0.0:8000 &
-            EOF
+          EOF
