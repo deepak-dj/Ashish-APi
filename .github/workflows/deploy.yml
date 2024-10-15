@@ -1,4 +1,4 @@
-name: CI/CD Deploy Django to EC2
+name: Deploy Django to EC2
 
 on:
   push:
@@ -20,39 +20,28 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
+      - name: Build Docker Image
+        run: |
+          docker build -t your_docker_image_name .
+
+      - name: Push Docker Image
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker tag your_docker_image_name "${{ secrets.DOCKER_USERNAME }}/your_docker_image_name:latest"
+          docker push "${{ secrets.DOCKER_USERNAME }}/your_docker_image_name:latest"
+
       - name: Deploy to EC2
         run: |
-          # Sync files to EC2 instance
-          rsync -avz --delete --exclude='.git' ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.DEPLOY_PATH }}
-
-          # SSH into EC2 instance and setup the environment
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd ${{ secrets.DEPLOY_PATH }}
+            # Pull the latest Docker image
+            docker pull "${{ secrets.DOCKER_USERNAME }}/your_docker_image_name:latest"
 
-            # Update package list and install required packages
-            sudo apt update
-            sudo apt install -y python3.12 python3.12-venv python3-pip libpq-dev
+            # Stop and remove the existing container if it exists
+            docker stop your_container_name || true
+            docker rm your_container_name || true
 
-            VIRTUAL_ENV=venv
-            # Create a virtual environment if it doesn't exist
-            if [ ! -d "$VIRTUAL_ENV" ]; then
-              python3.12 -m venv "$VIRTUAL_ENV"
-            fi
-
-            # Activate the virtual environment
-            source "$VIRTUAL_ENV/bin/activate"
-
-            # Upgrade pip and install dependencies
-            pip install --upgrade pip
-            pip install -r requirements.txt
-
-            # Run database migrations
-            python manage.py migrate
-
-            # Collect static files
-            python manage.py collectstatic --noinput
-
-            # Restart the Django application (using runserver)
-            pkill -f "runserver"  # Kill existing runserver processes
-            nohup python manage.py runserver 0.0.0.0:8000 &
+            # Run the new container
+            docker run -d --name your_container_name -p 8000:8000 \
+              -e DATABASE_URL=postgres://your_db_user:your_db_password@db:5432/your_db_name \
+              "${{ secrets.DOCKER_USERNAME }}/your_docker_image_name:latest"
           EOF
