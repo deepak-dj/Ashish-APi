@@ -1,4 +1,4 @@
-name: CI/CD Deploy FastAPI to EC2
+name: CI/CD Deploy Django to EC2
 
 on:
   push:
@@ -28,6 +28,7 @@ jobs:
           # SSH into EC2 instance and setup the environment
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd ${{ secrets.DEPLOY_PATH }}
+            VIRTUAL_ENV=venv
             # Create a virtual environment if it doesn't exist
             if [ ! -d "$VIRTUAL_ENV" ]; then
               python3 -m venv $VIRTUAL_ENV
@@ -35,10 +36,15 @@ jobs:
 
             # Activate the virtual environment and install dependencies
             source $VIRTUAL_ENV/bin/activate
-            pip install -r Ashish-Api/requirements.txt
+            pip install -r requirements.txt
 
-            # Restart the FastAPI application (using Uvicorn or similar)
-            # Adjust the command based on your setup
-            pkill -f "uvicorn"  # Kill existing Uvicorn processes
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 &  # Start FastAPI in the background
+            # Run database migrations
+            python manage.py migrate
+
+            # Collect static files
+            python manage.py collectstatic --noinput
+
+            # Restart the Django application (using Gunicorn or similar)
+            pkill -f "gunicorn"  # Kill existing Gunicorn processes
+            nohup gunicorn your_project_name.wsgi:application --bind 0.0.0.0:8000 &  # Start Django in the background
           EOF
