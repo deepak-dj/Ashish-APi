@@ -35,7 +35,7 @@ jobs:
 
             # Activate the virtual environment and install dependencies
             source $VIRTUAL_ENV/bin/activate
-            pip install -r requirements.txt
+            pip install -r Ashish-Api/requirements.txt
 
             # Restart the FastAPI application (using Uvicorn or similar)
             # Adjust the command based on your setup
