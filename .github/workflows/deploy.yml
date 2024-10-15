@@ -31,7 +31,7 @@ jobs:
 
             # Update package list and install required packages
             sudo apt update
-            sudo apt install -y python3.12 python3.12-venv python3-pip
+            sudo apt install -y python3.12 python3.12-venv python3-pip libpq-dev
 
             VIRTUAL_ENV=venv
             # Create a virtual environment if it doesn't exist
